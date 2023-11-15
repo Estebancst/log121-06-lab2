@@ -16,16 +16,28 @@ public class FenetrePrincipale extends JFrame {
   private VuePerspective1 vue2;
   private VuePerspective2 vue3;
 
-    public FenetrePrincipale(String titre) {
+    public FenetrePrincipale() {
       this.vue1 = new VueThumbnail();
       this.vue2 = new VuePerspective1();
       this.vue3 = new VuePerspective2();
       MenuFenetre menuFenetre = new MenuFenetre();
+      setJMenuBar(menuFenetre);
 
-      add(vue1);
-      add(vue2);
-      add(vue3);
-      add(menuFenetre, BorderLayout.NORTH);
+
+      // Définir le layout des panneaux comme BoxLayout pour les aligner verticalement
+      vue1.setLayout(new BoxLayout(vue1, BoxLayout.Y_AXIS));
+      vue2.setLayout(new BoxLayout(vue2, BoxLayout.Y_AXIS));
+      vue3.setLayout(new BoxLayout(vue3, BoxLayout.Y_AXIS));
+
+      // Utiliser un GridLayout pour les panneaux
+      JPanel panelContainer = new JPanel(new GridLayout(1, 3));
+      panelContainer.add(vue1);
+      panelContainer.add(vue2);
+      panelContainer.add(vue3);
+
+      // Ajouter les panneaux au conteneur principal
+      getContentPane().setLayout(new BorderLayout());
+      getContentPane().add(panelContainer, BorderLayout.CENTER);
 
       setDefaultCloseOperation(EXIT_ON_CLOSE);
       setTitle(TITRE_FENETRE);
@@ -39,7 +51,7 @@ public class FenetrePrincipale extends JFrame {
     public static void main(String[] args) {
       SwingUtilities.invokeLater(new Runnable() {
         public void run() {
-          new FenetrePrincipale("LAB2");
+          new FenetrePrincipale();
         }
       });
     }
