@@ -8,11 +8,12 @@ import javax.swing.*;
 import java.util.Observable;
 import java.util.Observer;
 
-public class VuePerspectiveGauche extends JPanel implements Observer {
+public class VuePerspective extends JPanel implements Observer {
+    //Panneau du milieu qui contient l'image et les boutons de commandes
     private ImageEventManager eventManager;
     private Perspective perspective;
 
-    public VuePerspectiveGauche(Perspective perspective) {
+    public VuePerspective(Perspective perspective) {
         this.perspective = perspective;
         this.eventManager = new ImageEventManager(perspective);
         this.addMouseListener(eventManager);

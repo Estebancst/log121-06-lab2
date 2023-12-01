@@ -27,13 +27,12 @@ public class FenetrePrincipale extends JFrame {;
   private static final String MENU_DEFAIRE_PERSPECTIVE = "Défaire";
   private static final String MENU_REFAIRE_PERSPECTIVE = "Refaire";
   private static final Dimension DIMENSION = new Dimension(900, 700);
-  private VueThumbnail vue1;
-  private VuePerspectiveDroite vue2;
-  private VuePerspectiveGauche vue3;
+  private VueThumbnail vueThumbnail;
+  private VuePerspective vuePerspectiveGauche;
+  private VuePerspective vuePerspectiveDroite;
   private Thumbnail thumbnail;
-  private final Perspective perspectiveDroite;
   private final Perspective perspectiveGauche;
-
+  private final Perspective perspectiveDroite;
     public FenetrePrincipale() {
 
       // Create a menu bar
@@ -47,27 +46,29 @@ public class FenetrePrincipale extends JFrame {;
       setJMenuBar(menuBar);
 
       thumbnail = new Thumbnail();
-      this.vue1 = new VueThumbnail(thumbnail);
-      thumbnail.addObserver(vue1);
-      perspectiveDroite = new Perspective(thumbnail);
-      this.vue2 = new VuePerspectiveDroite(perspectiveDroite);
-      thumbnail.addObserver(vue2);
-      perspectiveDroite.addObserver(vue2);
+      this.vueThumbnail = new VueThumbnail(thumbnail);
+      thumbnail.addObserver(vueThumbnail);
+
       perspectiveGauche = new Perspective(thumbnail);
-      this.vue3 = new VuePerspectiveGauche(perspectiveGauche);
-      thumbnail.addObserver(vue3);
-      perspectiveGauche.addObserver(vue3);
+      this.vuePerspectiveGauche = new VuePerspective(perspectiveGauche);
+      thumbnail.addObserver(vuePerspectiveGauche);
+      perspectiveGauche.addObserver(vuePerspectiveGauche);
+
+      perspectiveDroite = new Perspective(thumbnail);
+      this.vuePerspectiveDroite = new VuePerspective(perspectiveDroite);
+      thumbnail.addObserver(vuePerspectiveDroite);
+      perspectiveDroite.addObserver(vuePerspectiveDroite);
 
       // Définir le layout des panneaux comme BoxLayout pour les aligner verticalement
-      vue1.setLayout(new BoxLayout(vue1, BoxLayout.Y_AXIS));
-      vue2.setLayout(new BoxLayout(vue2, BoxLayout.Y_AXIS));
-      vue3.setLayout(new BoxLayout(vue3, BoxLayout.Y_AXIS));
+      vueThumbnail.setLayout(new BoxLayout(vueThumbnail, BoxLayout.Y_AXIS));
+      vuePerspectiveGauche.setLayout(new BoxLayout(vuePerspectiveGauche, BoxLayout.Y_AXIS));
+      vuePerspectiveDroite.setLayout(new BoxLayout(vuePerspectiveDroite, BoxLayout.Y_AXIS));
 
       // Utiliser un GridLayout pour les panneaux
       JPanel panelContainer = new JPanel(new GridLayout(1, 3));
-      panelContainer.add(vue1);
-      panelContainer.add(vue2);
-      panelContainer.add(vue3);
+      panelContainer.add(vueThumbnail);
+      panelContainer.add(vuePerspectiveGauche);
+      panelContainer.add(vuePerspectiveDroite);
 
       // Ajouter les panneaux au conteneur principal
       getContentPane().setLayout(new BorderLayout());
@@ -106,8 +107,8 @@ public class FenetrePrincipale extends JFrame {;
 
       if (returnValue == JFileChooser.APPROVE_OPTION) {
         File file = fileChooser.getSelectedFile();
-        savePerspective(perspectiveDroite, file);
         savePerspective(perspectiveGauche, file);
+        savePerspective(perspectiveDroite, file);
       }
     });
 
@@ -122,10 +123,10 @@ public class FenetrePrincipale extends JFrame {;
         Perspective loadedPerspective = loadPerspective(file);
         if (loadedPerspective != null) {
           // Do something with the loaded perspective, e.g., update the UI
-          perspectiveDroite.setPosition(loadedPerspective.getPosition());
-          perspectiveDroite.setZoomLevel(loadedPerspective.getZoomLevel());
           perspectiveGauche.setPosition(loadedPerspective.getPosition());
           perspectiveGauche.setZoomLevel(loadedPerspective.getZoomLevel());
+          perspectiveDroite.setPosition(loadedPerspective.getPosition());
+          perspectiveDroite.setZoomLevel(loadedPerspective.getZoomLevel());
         }
       }
     });
@@ -166,8 +167,8 @@ public class FenetrePrincipale extends JFrame {;
       newImage = ImageIO.read(file);
 
       // Get the dimensions of vue1
-      int targetWidth = vue1.getWidth();
-      int targetHeight = vue1.getHeight();
+      int targetWidth = vueThumbnail.getWidth();
+      int targetHeight = vueThumbnail.getHeight();
 
       // Calculate scaling factors
       double scaleX = (double) targetWidth / newImage.getWidth();
