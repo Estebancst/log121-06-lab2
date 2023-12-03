@@ -18,12 +18,14 @@ public class ImageEventManager extends MouseAdapter implements MouseMotionListen
     private float initialZoom;
     private Point distanceFromCorner;
 
+    // Constructeur prenant une perspective en paramètre
     public ImageEventManager(Perspective perspective) {
         this.perspective = perspective;
         this.isDragging = false;
         this.zoomTimer = new Timer(THROTTLE_DELAY_IN_MS, e -> saveZoom());
     }
 
+    // Événement déclenché lorsqu'un bouton de la souris est pressé
     @Override
     public void mousePressed(MouseEvent e) {
         isDragging = true;
@@ -31,6 +33,7 @@ public class ImageEventManager extends MouseAdapter implements MouseMotionListen
         initialPosition = perspective.getPosition();
     }
 
+    // Événement déclenché lorsqu'un bouton de la souris est relâché
     @Override
     public void mouseReleased(MouseEvent e) {
         if (isDragging) {
@@ -40,6 +43,8 @@ public class ImageEventManager extends MouseAdapter implements MouseMotionListen
         isDragging = false;
     }
 
+
+    // Événement déclenché lors du mouvement de la molette de la souris
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
@@ -60,6 +65,7 @@ public class ImageEventManager extends MouseAdapter implements MouseMotionListen
         }
     }
 
+    // Événement déclenché lors du déplacement de la souris (drag-and-drop)
     @Override
     public void mouseDragged(MouseEvent e) {
         if (isDragging) {
@@ -67,16 +73,19 @@ public class ImageEventManager extends MouseAdapter implements MouseMotionListen
         }
     }
 
+    // Méthode pour enregistrer le zoom après le throttling
     private void saveZoom() {
         zoomTimer.stop();
         Commande zoomCommand = CommandeFactory.createZoomCommand(initialPosition, initialZoom, perspective);
         GestionnaireCommandes.getInstance().execute(zoomCommand);
     }
 
+    // Méthode pour obtenir la position traduite en fonction du zoom
     private Point getTranslatedPosition(Point mousePosition) {
         return new Point(Math.round((mousePosition.x / perspective.getZoomLevel() - distanceFromCorner.x)), Math.round((mousePosition.y / perspective.getZoomLevel() - distanceFromCorner.y)));
     }
 
+    // Méthode pour obtenir la nouvelle position en fonction du nouveau zoom
     private Point getNewZoomPosition(Point mousePosition, float initialZoom, float newZoom) {
         float initialMousePositionX = (float) perspective.getPosition().x + (float) mousePosition.x / newZoom;
         float initialMousePositionY = (float) perspective.getPosition().y + (float) mousePosition.y / newZoom;
