@@ -34,24 +34,16 @@ public class GestionnaireCommandes {
 
     // Méthode pour annuler la dernière commande exécutée
     public void undo() {
-         
         Commande commande = commandes.pop();
-        
         if (commande != null) {
             commande.undo();
-            
         }
     }
 
     // Méthode pour rétablir la dernière commande annulée
     public void redo() {
-        
-        
         if (commandes.hasNext()) {
-            
-
             commandes.next().execute();
-            
         }
     }
 }

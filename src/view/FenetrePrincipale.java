@@ -155,12 +155,10 @@ public class FenetrePrincipale extends JFrame {;
    */
   public void enregistrerPerspective (JMenuItem menuEnregistrerPerspective){
 
-       // Enregistrer la perspective
+    // Enregistrer la perspective
     menuEnregistrerPerspective.addActionListener((ActionEvent e) -> {
       JFileChooser fileChooser = new JFileChooser();
       int returnValue = fileChooser.showSaveDialog(FenetrePrincipale.this);
-     
-
       if (returnValue == JFileChooser.APPROVE_OPTION) {
 
         File file = fileChooser.getSelectedFile();
@@ -172,7 +170,6 @@ public class FenetrePrincipale extends JFrame {;
           savePerspective(perspectives, file);
           
         } catch (IOException e1) {
-          // TODO Auto-generated catch block
           e1.printStackTrace();
         }
       }
@@ -208,10 +205,8 @@ public class FenetrePrincipale extends JFrame {;
         }
 
         } catch (ClassNotFoundException e1) {
-          // TODO Auto-generated catch block
           e1.printStackTrace();
         } catch (IOException e1) {
-          // TODO Auto-generated catch block
           e1.printStackTrace();
         }
         
@@ -251,32 +246,33 @@ public class FenetrePrincipale extends JFrame {;
   private void loadImage(File file) {
     BufferedImage newImage;
     try {
+      // Lire l'image à partir du fichier
       newImage = ImageIO.read(file);
 
-      // Get the dimensions of vue1
+      // Obtenir les dimensions de vueThumbnail
       int targetWidth = vueThumbnail.getWidth();
       int targetHeight = vueThumbnail.getHeight();
 
-      // Calculate scaling factors
+      // Calculer les facteurs d'échelle
       double scaleX = (double) targetWidth / newImage.getWidth();
       double scaleY = (double) targetHeight / newImage.getHeight();
 
-      // Choose the minimum scaling factor to maintain the image's aspect ratio
+      // Choisir le facteur d'échelle minimal pour maintenir le ratio d'aspect de l'image
       double scale = Math.min(scaleX, scaleY);
 
-      // Calculate the position to center the scaled image
+      // Calculer la position pour centrer l'image redimensionnée
       int x = (int) ((targetWidth - scale * newImage.getWidth()) / 2);
       int y = (int) ((targetHeight - scale * newImage.getHeight()) / 2);
 
-      // Create a new BufferedImage and scale the image
+      // Créer une nouvelle BufferedImage et redimensionner l'image
       BufferedImage scaledBufferedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
       Graphics2D g = scaledBufferedImage.createGraphics();
 
-      // Draw the scaled image at the calculated position
+      // Dessiner l'image redimensionnée à la position calculée
       g.drawImage(newImage.getScaledInstance((int) (newImage.getWidth() * scale), (int) (newImage.getHeight() * scale), Image.SCALE_SMOOTH), x, y, null);
       g.dispose();
 
-      // Update the Thumbnail with the scaled image
+      // Mettre à jour la miniature avec l'image redimensionnée
       Commande command = CommandeFactory.createLoadImageCommand(thumbnail, scaledBufferedImage);
       GestionnaireCommandes.getInstance().execute(command);
     } catch (IOException e) {
@@ -309,10 +305,8 @@ public class FenetrePrincipale extends JFrame {;
    * @throws IOException
    */
   private EnsemblePerspectives loadPerspective (File file) throws ClassNotFoundException, IOException {
-
     ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
     return (EnsemblePerspectives) ois.readObject();
-
   }
 
 }

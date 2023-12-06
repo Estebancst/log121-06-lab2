@@ -45,32 +45,4 @@ public class Perspective extends Observable implements Serializable {
     public Thumbnail getReference() {
         return reference;
     }
-
-    // Méthode pour sérialiser la perspective en une chaîne Base64
-    public String serialize() {
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeObject(this);
-            oos.close();
-            return Base64.getEncoder().encodeToString(bos.toByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    // Méthode statique pour désérialiser une perspective à partir d'une chaîne Base64
-    public static Perspective deserialize(String serializedData) {
-        try {
-            byte[] data = Base64.getDecoder().decode(serializedData);
-            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
-            Perspective perspective = (Perspective) ois.readObject();
-            ois.close();
-            return perspective;
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 }
