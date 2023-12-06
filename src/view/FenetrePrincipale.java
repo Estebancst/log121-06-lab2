@@ -1,4 +1,4 @@
-package demarrageApp;
+package view;
 import java.awt.*;
 import java.awt.event.*;
 import javax.imageio.ImageIO;
@@ -7,12 +7,14 @@ import javax.swing.*;
 import controller.Commande;
 import controller.CommandeFactory;
 import controller.GestionnaireCommandes;
+import model.EnsemblePerspectives;
 import model.Perspective;
 import model.Thumbnail;
 import view.*;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.ArrayList;
 
 public class FenetrePrincipale extends JFrame {;
 
@@ -33,9 +35,37 @@ public class FenetrePrincipale extends JFrame {;
   private Thumbnail thumbnail;
   private final Perspective perspectiveGauche;
   private final Perspective perspectiveDroite;
+
     public FenetrePrincipale() {
 
-      // Create a menu bar
+      thumbnail = new Thumbnail();
+      vueThumbnail = new VueThumbnail(thumbnail);
+      thumbnail.addObserver(vueThumbnail);
+
+      perspectiveGauche = new Perspective(thumbnail);
+      vuePerspectiveGauche = new VuePerspective(perspectiveGauche);
+      thumbnail.addObserver(vuePerspectiveGauche);
+      perspectiveGauche.addObserver(vuePerspectiveGauche);
+
+      perspectiveDroite = new Perspective(thumbnail);
+      vuePerspectiveDroite = new VuePerspective(perspectiveDroite);
+      thumbnail.addObserver(vuePerspectiveDroite);
+      perspectiveDroite.addObserver(vuePerspectiveDroite);
+
+      initFenetrePrincipale(vueThumbnail, vuePerspectiveGauche, vuePerspectiveDroite);
+
+    }
+
+    /**
+     * Permet d'initialiser les paramètres de la fenêtre principale
+     * 
+     * @param vueThumbnail
+     * @param vuePerspectiveG
+     * @param vuePerspectiveD
+     */
+  public void initFenetrePrincipale(JPanel vueThumbnail, JPanel vuePerspectiveG, JPanel vuePerspectiveD ){
+
+    // Create a menu bar
       JMenuBar menuBar = new JMenuBar();
 
       // Add the file menu to the menu bar
@@ -45,30 +75,11 @@ public class FenetrePrincipale extends JFrame {;
       // Set the menu bar for the frame
       setJMenuBar(menuBar);
 
-      thumbnail = new Thumbnail();
-      this.vueThumbnail = new VueThumbnail(thumbnail);
-      thumbnail.addObserver(vueThumbnail);
-
-      perspectiveGauche = new Perspective(thumbnail);
-      this.vuePerspectiveGauche = new VuePerspective(perspectiveGauche);
-      thumbnail.addObserver(vuePerspectiveGauche);
-      perspectiveGauche.addObserver(vuePerspectiveGauche);
-
-      perspectiveDroite = new Perspective(thumbnail);
-      this.vuePerspectiveDroite = new VuePerspective(perspectiveDroite);
-      thumbnail.addObserver(vuePerspectiveDroite);
-      perspectiveDroite.addObserver(vuePerspectiveDroite);
-
-      // Définir le layout des panneaux comme BoxLayout pour les aligner verticalement
-      vueThumbnail.setLayout(new BoxLayout(vueThumbnail, BoxLayout.Y_AXIS));
-      vuePerspectiveGauche.setLayout(new BoxLayout(vuePerspectiveGauche, BoxLayout.Y_AXIS));
-      vuePerspectiveDroite.setLayout(new BoxLayout(vuePerspectiveDroite, BoxLayout.Y_AXIS));
-
       // Utiliser un GridLayout pour les panneaux
       JPanel panelContainer = new JPanel(new GridLayout(1, 3));
       panelContainer.add(vueThumbnail);
-      panelContainer.add(vuePerspectiveGauche);
-      panelContainer.add(vuePerspectiveDroite);
+      panelContainer.add(vuePerspectiveG);
+      panelContainer.add(vuePerspectiveD);
 
       // Ajouter les panneaux au conteneur principal
       getContentPane().setLayout(new BorderLayout());
@@ -80,14 +91,50 @@ public class FenetrePrincipale extends JFrame {;
       setVisible(true);
       setLocationRelativeTo(null);
       setResizable(false);
-    }
 
+  }
+
+  /**
+   * permet d'initialiser les éléments du menu déroulant fichier. Ce menu déroulant contient 
+   * les options ouvrirImage, enregistrerPerspective et chargerPerspective
+   * 
+   * @return JMenu menuFichier
+   */
   private JMenu ajouterMenuFichier() {
+
     JMenu menuFichier = new JMenu(MENU_FICHIER_TITRE);
     JMenuItem menuOuvrirImage = new JMenuItem(MENU_OUVRIR_IMAGE);
     JMenuItem menuEnregistrerPerspective = new JMenuItem(MENU_ENREGISTRER_PERSPECTIVE);
     JMenuItem menuChargerPerspective = new JMenuItem(MENU_CHARGER_PERSPECTIVE);
     JMenuItem menuQuitter = new JMenuItem(MENU_FICHIER_QUITTER);
+
+    menuFichier.add(menuOuvrirImage);
+    ouvrirImageThumbnail (menuOuvrirImage);
+
+    menuFichier.add(menuEnregistrerPerspective);
+    enregistrerPerspective (menuEnregistrerPerspective);
+
+    menuFichier.add(menuChargerPerspective);
+    chargerPerspective (menuChargerPerspective);
+
+    menuFichier.addSeparator();
+    menuFichier.add(menuQuitter);
+    add(menuFichier);
+
+    menuQuitter.addActionListener((ActionEvent e) -> {
+      System.exit(0);
+    });
+
+    return menuFichier;
+  }
+
+  /**
+   * methode qui permet d'ouvrir l'image thumbnail
+   * 
+   * @param menuOuvrirImage item du menu Fichier
+   */
+
+  public void ouvrirImageThumbnail (JMenuItem menuOuvrirImage){
 
     // Ouvrir image thumbnail
     menuOuvrirImage.addActionListener((ActionEvent e) -> {
@@ -99,50 +146,84 @@ public class FenetrePrincipale extends JFrame {;
         loadImage(file);
       }
     });
+  }
 
-    // Enregistrer la perspective
+  /**
+   * methode qui permet d'enregistrer la perspective
+   * 
+   * @param menuEnregistrerPerspective item du menu Fichier
+   */
+  public void enregistrerPerspective (JMenuItem menuEnregistrerPerspective){
+
+       // Enregistrer la perspective
     menuEnregistrerPerspective.addActionListener((ActionEvent e) -> {
       JFileChooser fileChooser = new JFileChooser();
       int returnValue = fileChooser.showSaveDialog(FenetrePrincipale.this);
+     
 
       if (returnValue == JFileChooser.APPROVE_OPTION) {
+
         File file = fileChooser.getSelectedFile();
-        savePerspective(perspectiveGauche, file);
-        savePerspective(perspectiveDroite, file);
+
+        EnsemblePerspectives perspectives = new EnsemblePerspectives(perspectiveGauche, perspectiveDroite);
+        
+        try {
+
+          savePerspective(perspectives, file);
+          
+        } catch (IOException e1) {
+          // TODO Auto-generated catch block
+          e1.printStackTrace();
+        }
       }
     });
+  }
 
+    /**
+     * methode qui permet de charger la perspective
+     * 
+     * @param menuChargerPerspective item du menu Fichier
+     */
+  private void chargerPerspective(JMenuItem menuChargerPerspective) {
 
-    // Charger la perspective
+     // Charger la perspective
     menuChargerPerspective.addActionListener((ActionEvent e) -> {
       JFileChooser fileChooser = new JFileChooser();
       int returnValue = fileChooser.showOpenDialog(FenetrePrincipale.this);
 
       if (returnValue == JFileChooser.APPROVE_OPTION) {
         File file = fileChooser.getSelectedFile();
-        Perspective loadedPerspective = loadPerspective(file);
-        if (loadedPerspective != null) {
-          // Do something with the loaded perspective, e.g., update the UI
-          perspectiveGauche.setPosition(loadedPerspective.getPosition());
-          perspectiveGauche.setZoomLevel(loadedPerspective.getZoomLevel());
-          perspectiveDroite.setPosition(loadedPerspective.getPosition());
-          perspectiveDroite.setZoomLevel(loadedPerspective.getZoomLevel());
+
+        EnsemblePerspectives loadedPerspectives;
+
+        try {
+          loadedPerspectives = loadPerspective(file);
+
+          if (loadedPerspectives != null) {
+          //charger les diffferentes perspectives selon leur position dans la arraylist
+          perspectiveGauche.setPosition(loadedPerspectives.getPerspectiG().getPosition());
+          perspectiveGauche.setZoomLevel(loadedPerspectives.getPerspectiG().getZoomLevel());
+          perspectiveDroite.setPosition(loadedPerspectives.getperspectiveD().getPosition());
+          perspectiveDroite.setZoomLevel(loadedPerspectives.getperspectiveD().getZoomLevel());
         }
+
+        } catch (ClassNotFoundException e1) {
+          // TODO Auto-generated catch block
+          e1.printStackTrace();
+        } catch (IOException e1) {
+          // TODO Auto-generated catch block
+          e1.printStackTrace();
+        }
+        
       }
     });
-
-    menuQuitter.addActionListener((ActionEvent e) -> {
-      System.exit(0);
-    });
-
-    menuFichier.add(menuOuvrirImage);
-    menuFichier.add(menuEnregistrerPerspective);
-    menuFichier.add(menuChargerPerspective);
-    menuFichier.addSeparator();
-    menuFichier.add(menuQuitter);
-    add(menuFichier);
-    return menuFichier;
   }
+
+/**
+ * permet d'initialiser les éléments du menu déroulant Edition
+ * 
+ * @return JMenu menu Edition
+ */
 
   private JMenu ajouterMenuEdition() {
     JMenu menuEdit = new JMenu(MENU_EDITION_TITRE);
@@ -160,6 +241,12 @@ public class FenetrePrincipale extends JFrame {;
     add(menuEdit);
     return menuEdit;
   }
+
+  /**
+   * permet de charger une image
+   * 
+   * @param file
+   */
 
   private void loadImage(File file) {
     BufferedImage newImage;
@@ -197,25 +284,35 @@ public class FenetrePrincipale extends JFrame {;
     }
   }
 
-  private void savePerspective(Perspective perspective, File file) {
-    try (PrintWriter writer = new PrintWriter(file)) {
-      writer.write(perspective.serialize());
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
+  /**
+   * Permet de sauvegarder la perspective
+   * 
+   * @param perspectives ensemble des deux perspectives
+   * @param file
+   * @throws IOException
+   */
+
+  private void savePerspective(EnsemblePerspectives perspectives, File file) throws IOException {
+
+    ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
+    oos.writeObject(perspectives);
+
+  }
+  
+  /**
+   * permet de charger les perspectives
+   * 
+   * @param file
+   * @return ensemble des deux perspectives
+   * 
+   * @throws ClassNotFoundException
+   * @throws IOException
+   */
+  private EnsemblePerspectives loadPerspective (File file) throws ClassNotFoundException, IOException {
+
+    ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+    return (EnsemblePerspectives) ois.readObject();
+
   }
 
-  private Perspective loadPerspective(File file) {
-    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-      StringBuilder stringBuilder = new StringBuilder();
-      String line;
-      while ((line = reader.readLine()) != null) {
-        stringBuilder.append(line);
-      }
-      return Perspective.deserialize(stringBuilder.toString());
-    } catch (IOException e) {
-      e.printStackTrace();
-      return null;
-    }
-  }
 }

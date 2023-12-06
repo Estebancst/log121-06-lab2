@@ -1,12 +1,15 @@
 package controller;
 
+import java.util.LinkedList;
+import java.util.ListIterator;
+
 public class GestionnaireCommandes {
 
     // Instance unique du gestionnaire de commandes (Singleton)
     private static GestionnaireCommandes instance;
 
     // Pile pour stocker les commandes exécutées
-    private DoublyLinkedStack<Commande> commandes;
+    private DoublyLinkedStack <Commande> commandes;
 
     // Constructeur privé pour garantir une seule instance du gestionnaire de commandes
     private GestionnaireCommandes() {
@@ -31,16 +34,24 @@ public class GestionnaireCommandes {
 
     // Méthode pour annuler la dernière commande exécutée
     public void undo() {
+         
         Commande commande = commandes.pop();
+        
         if (commande != null) {
             commande.undo();
+            
         }
     }
 
     // Méthode pour rétablir la dernière commande annulée
     public void redo() {
+        
+        
         if (commandes.hasNext()) {
+            
+
             commandes.next().execute();
+            
         }
     }
 }
