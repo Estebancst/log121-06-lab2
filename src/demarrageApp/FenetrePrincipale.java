@@ -1,4 +1,4 @@
-package view;
+package demarrageApp;
 import java.awt.*;
 import java.awt.event.*;
 import javax.imageio.ImageIO;
