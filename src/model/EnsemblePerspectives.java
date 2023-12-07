@@ -1,6 +1,12 @@
 package model;
 import java.io.Serializable;
 
+/**
+ * permet de rassembler les perspectives dans un ensemble.
+ * fourni les methodes (getteurs) pour récupérer distinctivement chaque perspective  
+ * de l'ensemble
+ */
+
 public class EnsemblePerspectives implements Serializable{
 
     private Perspective perspectiveG;
@@ -9,7 +15,6 @@ public class EnsemblePerspectives implements Serializable{
     public EnsemblePerspectives (Perspective perspectiveG, Perspective perspectiveD){
         this.perspectiveG = perspectiveG;
         this.perspectiveD = perspectiveD;
-
     }
 
     public Perspective getPerspectiG(){
@@ -19,7 +24,5 @@ public class EnsemblePerspectives implements Serializable{
     public Perspective getperspectiveD (){
         return perspectiveD;
     }
-
-
 
 }
